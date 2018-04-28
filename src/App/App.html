@@ -1,0 +1,117 @@
+<div id="app">
+  <div v-if="page.name == 'auth'" style="padding: 10px">
+      <table>
+          <tr>
+          <td>
+              <h1 class="formHeader">Sign to VNO</h1>
+              <div class="authForm">
+                <label>Username</label>
+                <input type="text" v-model="auth.username" placeholder="username" class="form-control input-block"/>
+                <label>Password</label>
+                <input type="password" v-model="auth.password" placeholder="password" class="form-control input-block"/>
+                <button v-on:click="signIn">Sign In</button>
+              </div>
+          </td>
+          </tr>
+          <tr>
+          <td>
+              New to VNO?
+              <div v-on:click="page.name = 'regist'" class="link">Create an account.</div>
+          </td>
+          </tr>
+          <h3 class="error" v-if="errors.auth">Incorrect username or password</h3>
+      </table>
+  </div>
+
+  <div v-else-if="page.name == 'profile'" >
+    <table>
+        <tr>
+            <td>
+                <!-- Personal information -->
+                <div style="margin-left: 20px; padding: 10px; background-color:#d4ecfa;" >
+                    <label for="name">Name:</label>
+                    <h2 id="name">{{userAccount.firstname}} {{userAccount.lastname}}</h2>
+                    <label for="username"> Username:</label>
+                    <h2 id="username">{{userAccount.username}}</h2>
+                </div>
+            </td>
+            <td>
+                <!-- List of repositoires -->
+                <div style="margin-left: 20px; padding: 10px; background-color:#d4ecfa;">
+                    <h1>Your repositories</h1>
+
+                    <div @click="createNewRepo()" class="link">
+                        Add new repo
+                    </div>
+
+                    <div v-for="repo in repos" style="padding: 10px">
+                        <label for="repository-name">Repository name:</label>
+                        <h2 @click="clickToRepo(repo);" class="link" id="repository-name">{{repo.name}}</h2>
+                        <label for="description">Description:</label>
+                        <h4 id="description">{{repo.description}}</h4>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    </table>
+  </div>
+
+  <div v-else-if="page.name == 'regist'" style="padding: 10px">
+    <table>
+      <tr>
+        <td>
+          <h1 class="formHeader">Register to VNO</h1>
+          <div class="authForm">
+            <label>Username</label>
+            <input type="text" v-model="auth.username" placeholder="username" class="form-control input-block"/>
+            <label>Password</label>
+            <input type="password" v-model="auth.password" placeholder="password" class="form-control input-block"/>
+            <button v-on:click="signUp">Sign Un</button>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          Already have an account?
+          <div v-on:click="page.name = 'auth'"  class="link">Sign In.</div>
+        </td>
+      </tr>
+      <h3 class="error" v-if="errors.regist">Incorrect username or password</h3>
+    </table>
+  </div>
+
+  <div v-if="curRepo.name" style="background-color:#b3cbd9;">
+    <label>Branches</label>
+    <select v-model="curRepo.branch.name">
+        <option v-for="branch in repos[''+curRepo.id].branches">
+            {{console(branch)}}
+          {{setCurBranchId(branch)}}
+        </option>
+    </select>
+
+    <div v-if="curRepo.branch.name">
+      Commits
+
+      <div v-for="commit in repos[''+curRepo.id].branches[''+ curRepo.branch.id].commits">
+          <table>
+              <tr>
+                  <td>
+                      <label>Message</label>
+                    {{commit.message}}
+                  </td>
+                  <td>
+                      <label>Timestamp</label>
+                      {{commit.timestamp}}
+                  </td>
+                  <td>
+                      <label>Author ID</label>
+                      {{commit.authorId}}
+                  </td>
+              </tr>
+          </table>
+      </div>
+    </div>
+  </div>
+
+
+</div>
