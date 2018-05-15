@@ -1,117 +1,283 @@
 <div id="app">
-  <div v-if="page.name == 'auth'" style="padding: 10px">
-      <table>
-          <tr>
-          <td>
-              <h1 class="formHeader">Sign to VNO</h1>
-              <div class="authForm">
-                <label>Username</label>
-                <input type="text" v-model="auth.username" placeholder="username" class="form-control input-block"/>
-                <label>Password</label>
-                <input type="password" v-model="auth.password" placeholder="password" class="form-control input-block"/>
-                <button v-on:click="signIn">Sign In</button>
-              </div>
-          </td>
-          </tr>
-          <tr>
-          <td>
-              New to VNO?
-              <div v-on:click="page.name = 'regist'" class="link">Create an account.</div>
-          </td>
-          </tr>
-          <h3 class="error" v-if="errors.auth">Incorrect username or password</h3>
-      </table>
-  </div>
+    <!-- AUTHORIZATION page -->
+    <div v-if="page.name == 'auth'" class="container-fluid text-left">
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
+                <h2 class="text-center">Sign to VNO</h2>
+                <div class="authForm">
+                    <label>Username</label>
+                    <input type="text" v-model="auth.username" placeholder="username" class="form-control input-block" required/>
+                    <label>Password</label>
+                    <input type="password" v-model="auth.password" placeholder="password" class="form-control input-block" required/>
 
-  <div v-else-if="page.name == 'profile'" >
-    <table>
-        <tr>
-            <td>
-                <!-- Personal information -->
-                <div style="margin-left: 20px; padding: 10px; background-color:#d4ecfa;" >
-                    <label for="name">Name:</label>
-                    <h2 id="name">{{userAccount.firstname}} {{userAccount.lastname}}</h2>
-                    <label for="username"> Username:</label>
-                    <h2 id="username">{{userAccount.username}}</h2>
+                    <button @click="signIn" class="btn btn-success btn-sm">Sign In</button>
                 </div>
-            </td>
-            <td>
-                <!-- List of repositoires -->
-                <div style="margin-left: 20px; padding: 10px; background-color:#d4ecfa;">
-                    <h1>Your repositories</h1>
 
-                    <div @click="createNewRepo()" class="link">
-                        Add new repo
-                    </div>
-
-                    <div v-for="repo in repos" style="padding: 10px">
-                        <label for="repository-name">Repository name:</label>
-                        <h2 @click="clickToRepo(repo);" class="link" id="repository-name">{{repo.name}}</h2>
-                        <label for="description">Description:</label>
-                        <h4 id="description">{{repo.description}}</h4>
-                    </div>
+                <div class="text-right">
+                    New to VNO?
+                    <button @click="page.name = 'regist'; errors.regist = false; errors.auth = false" class="btn btn-link btn-sm">Create an account</button>
                 </div>
-            </td>
-        </tr>
-    </table>
-  </div>
 
-  <div v-else-if="page.name == 'regist'" style="padding: 10px">
-    <table>
-      <tr>
-        <td>
-          <h1 class="formHeader">Register to VNO</h1>
-          <div class="authForm">
-            <label>Username</label>
-            <input type="text" v-model="auth.username" placeholder="username" class="form-control input-block"/>
-            <label>Password</label>
-            <input type="password" v-model="auth.password" placeholder="password" class="form-control input-block"/>
-            <button v-on:click="signUp">Sign Un</button>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td>
-          Already have an account?
-          <div v-on:click="page.name = 'auth'"  class="link">Sign In.</div>
-        </td>
-      </tr>
-      <h3 class="error" v-if="errors.regist">Incorrect username or password</h3>
-    </table>
-  </div>
-
-  <div v-if="curRepo.name" style="background-color:#b3cbd9;">
-    <label>Branches</label>
-    <select v-model="curRepo.branch.name">
-        <option v-for="branch in repos[''+curRepo.id].branches">
-            {{console(branch)}}
-          {{setCurBranchId(branch)}}
-        </option>
-    </select>
-
-    <div v-if="curRepo.branch.name">
-      Commits
-
-      <div v-for="commit in repos[''+curRepo.id].branches[''+ curRepo.branch.id].commits">
-          <table>
-              <tr>
-                  <td>
-                      <label>Message</label>
-                    {{commit.message}}
-                  </td>
-                  <td>
-                      <label>Timestamp</label>
-                      {{commit.timestamp}}
-                  </td>
-                  <td>
-                      <label>Author ID</label>
-                      {{commit.authorId}}
-                  </td>
-              </tr>
-          </table>
-      </div>
+                <div v-if="errors.auth"class="alert alert-danger" role="alert">
+                    Incorrect username or password
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
+    <!-- REGISTRATION page -->
+    <div v-if="page.name == 'regist'" class="container-fluid text-left">
+        <div class="row justify-content-center">
+            <div class="col-lg-3 col-md-4 col-sm-5 col-xs-6">
+                <h2 class="text-center">Register to VNO</h2>
+                <div class="authForm">
+                    <label>Username</label>
+                    <input type="text" v-model="auth.username" placeholder="username" class="form-control input-block"/>
+                    <label>Password</label>
+                    <input type="password" v-model="auth.password" placeholder="password" class="form-control input-block"/>
+                    <button @click="signUp" class="btn btn-success btn-sm">Sign Up</button>
+                </div>
+
+                <div class="text-right">
+                    Already have an account?
+                    <button @click="page.name = 'auth'; errors.regist = false; errors.auth = false" class="btn btn-link btn-sm">Sign In</button>
+                </div>
+
+                <div v-if="errors.regist"class="alert alert-danger" role="alert">
+                    Incorrect username or password
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- PROFILE page and REPOS list -->
+    <div v-else-if="page.name == 'profile'" class="container-fluid">
+        <div class="row justify-content-center">
+            <!-- Personal information -->
+            <div class="card col-2">
+                <img class="card-img-top" src="https://i1.wp.com/www.winhelponline.com/blog/wp-content/uploads/2017/12/user.png?fit=256%2C256&quality=100" alt="Card image cap">
+                <div class="card-body">
+                    <h4>{{userAccount.firstname}} {{userAccount.lastname}}</h4>
+                    <span id="username">{{userAccount.username}}</span>
+                </div>
+            </div>
+            <!-- List of repositories -->
+            <div class="col-8" style="background-color:#d4ecfa;">
+                <div class="row">
+                    <h3>Your repositories</h3>
+                    <!-- Add new repo modal form -->
+                    <a href="#" class="nav-link" data-toggle="modal" data-target="#addRepoModalForm">Add new repo</a>
+                    <div class="modal fade" id="addRepoModalForm" tabindex="-1" role="dialog" aria-labelledby="addRepoModalForm" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="addRepoModalFormLabel">Create new repository</h5>
+                                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container-fluid">
+                                    <div class="form-froup">
+                                        <label for="inputRepoName">Name</label>
+                                        <input v-model="page.createRepo.name" class="form-control" id="inputRepoName" aria-describedby="repository name" placeholder="Repository name" required>
+                                    </div>
+                                    <div class="form-froup">
+                                        <label for="inputRepoDesc">Description</label>
+                                        <input v-model="page.createRepo.description" class="form-control" id="inputRepoDesc" aria-describedby="repository description" placeholder="Repository description" required>
+                                    </div>
+
+                                    <button class="btn btn-primary create-repo" id="create-repo" @click="createNewRepo()">Create</button>
+                                </div>
+                            </div>
+                            <div v-if="!page.createRepo.name || !page.createRepo.description" class="modal-footer row">
+                                <div class="col-12" style="color: red;">
+                                    {{(!page.createRepo.name)? "Fill in the name field" : ""}}
+                                </div>
+                                <div class="col-12" style="color: red;">
+                                    {{(!page.createRepo.description)? "Fill in the description field" : ""}}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body row">
+                        <div class="col-4 jumbotron" v-for="repo in repos" style="padding: 10px">
+                            <h2><span class="badge-pill badge-light" @click="clickToRepo(repo);" style="cursor:pointer">{{repo.name}}</span></h2>
+                            <h6 id="description">{{repo.description}}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- REPO page -->
+    <div v-else-if="page.name == 'repo'" class="container-fluid">
+        <div class="row justify-content-center">
+            <!-- PATH -->
+            <div class="col-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#" @click="page.name = 'profile'">{{auth.username}}</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="#" @click="page.name = 'profile'">{{curRepo.name}}</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">{{curRepo.branch.name}}</li>
+                    </ol>
+                </nav>
+            </div>
+            <!-- BRANCHES -->
+            <div class="col-8">
+                <div class="row justify-content-between">
+                    <div class="col-8">
+                        <!-- Select branch -->
+                        <h4>Branch</h4>
+                        <select v-model="curRepo.branch.name">
+                            <option v-for="branch in repos[''+curRepo.id].branches">
+                                {{setCurBranchId(branch)}}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <!-- Delete branch modal form -->
+                        <a href="#" class="nav-link" data-toggle="modal" data-target="#deleteBranchModalForm">Delete branch</a>
+                        <div class="modal fade" id="deleteBranchModalForm" tabindex="-1" role="dialog" aria-labelledby="deleteBranchModalForm" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteBranchModalFormLabel">Delete branch</h5>
+                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <div class="form-froup">
+                                            <label>Enter a branch's name for the confirm deleting</label>
+                                            <input v-model="page.deleteBranch.name" class="form-control" aria-describedby="branch name" placeholder="Branch name" required>
+                                        </div>
+
+                                        <button class="btn btn-primary" id="delete-branch" @click="deleteBranch()">Delete</button>
+                                    </div>
+                                </div>
+                                <div v-if="!page.deleteBranch.name" class="modal-footer row">
+                                    <div class="col-12" style="color: red;">
+                                        {{(!page.deleteBranch.name)? "Fill in the name field" : ""}}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- Commits list-->
+                <h4>Commits</h4>
+                <div v-if="curRepo.branch.name">
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-info">
+                            <div class="row">
+                                <div class="col-4"><strong>Message</strong></div>
+                                <div class="col-4"><strong>Time</strong></div>
+                                <div class="col-4"><strong>Author</strong></div>
+                            </div>
+                        </li>
+                        <li class="list-group-item" v-for="commit in repos[''+curRepo.id].branches[''+ curRepo.branch.id].commits">
+                            <div class="row">
+                                <div class="col-4" @click="clickToCommit(commit);">
+                                    <a href="#">{{commit.message}}</a>
+                                </div>
+                                <div class="col-4">{{convertUnixtimeToTime(commit.timestamp)}}</div>
+                                <div class="col-4">{{getUsernameById(commit.authorId)}}</div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- COMMIT page -->
+    <div v-else-if="page.name == 'commit'" class="container-fluid">
+        <div class="row justify-content-center">
+            <!-- PATH -->
+            <div class="col-8">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a href="#" @click="page.name = 'profile'">{{auth.username}}</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="#" @click="page.name = 'profile'">{{curRepo.name}}</a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="#" @click="page.name = 'repo'">{{curRepo.branch.name}}</a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">#{{curRepo.commit.id}}</li>
+                    </ol>
+                </nav>
+            </div>
+            <!-- FILES -->
+            <div class="col-8">
+                <div class="row justify-content-between">
+                    <div class="col-8">
+                        <h4>Files</h4>
+                    </div>
+                    <div class="col-4">
+                        <!-- Add new branch modal form -->
+                        <a href="#" class="nav-link" data-toggle="modal" data-target="#createBranchModalForm">Create branch</a>
+                        <div class="modal fade" id="createBranchModalForm" tabindex="-1" role="dialog" aria-labelledby="createBranchModalForm" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="createBranchModalFormLabel">Create new branch</h5>
+                                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="container-fluid">
+                                        <div class="form-froup">
+                                            <label>Name</label>
+                                            <input v-model="page.createBranch.name" class="form-control" id="inputBranchName" aria-describedby="branch name" placeholder="Branch name" required>
+                                        </div>
+
+                                        <button class="btn btn-primary create-repo" id="create-branch" @click="createNewBranch()">Create</button>
+                                    </div>
+                                </div>
+                                <div v-if="!page.createBranch.name" class="modal-footer row">
+                                    <div class="col-12" style="color: red;">
+                                        {{(!page.createBranch.name)? "Fill in the name field" : ""}}
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <!-- Tags -->
 
 
+
+                <!-- List of files -->
+                <div v-if="curRepo.commit.id">
+                    <ul class="list-group">
+                        <li class="list-group-item list-group-item-info">
+                            <div class="row">
+                                <div class="col-8"><strong>Name</strong></div>
+                            </div>
+                        </li>
+
+                        <li class="list-group-item" v-for="blob in curRepo.commit.blobs">
+                            {{blob.name}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

@@ -8,9 +8,8 @@
     "build": "webpack"
   },
   "dependencies": {
-    "axios": "^0.18.0",
-    "vue": "^2.5.0",
-    "vue-router": "^3.0.1"
+    "bootstrap": "^4.1.1",
+    "vue": "^2.5.0"
   },
   "devDependencies": {
     "vue-loader": "^13.5.0",
