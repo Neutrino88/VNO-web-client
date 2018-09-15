@@ -198,6 +198,11 @@
                     </ul>
                 </div>
             </div>
+            <!-- CHARTs -->
+            <div class="col-8">
+                <commits-linechart :arg="getDataForLineChart()"></commits-linechart>
+                <contrib-doughnut :arg="getDataForDoughnut()"></contrib-doughnut>
+            </div>
         </div>
     </div>
     <!-- COMMIT page -->
@@ -224,7 +229,7 @@
             <div class="col-8">
                 <div class="row justify-content-between">
                     <div class="col-8">
-                        <h4>Files</h4>
+                        <h4>{{curRepo.commit.message}}</h4>
                     </div>
                     <div class="col-4">
                         <!-- Add new branch modal form -->

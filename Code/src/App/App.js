@@ -1,3 +1,6 @@
+import commitsHistory from '../Commits-history-linechart/History.vue';
+import contribDoughnut from '../Contributors-Doughnut/Doughnut.vue';
+
 export default {
     name: 'app',
     data () {
@@ -44,9 +47,7 @@ export default {
                 }
 			},
 			repos: {},
-            users: {
-
-            }
+            users: new Map(),
         }
     },
     methods: {
@@ -80,7 +81,7 @@ export default {
                     delete this.errors.auth;
                 }
 
-                this.users['' + response.id] = response;
+                this.users.set('' + response.id, response);
                 this.getReposAll();
             }
             else{
@@ -218,8 +219,9 @@ export default {
                 "tagIds": null
             };
 
-            this.console(JSON.stringify(data));
-           // return this.call("PUT", "/repo/", JSON.stringify(data));
+            let response = this.call("PUT", "/repo/", JSON.stringify(data));
+            console.log(response);
+            return response;
         },
         getUserInfo(userId){
             this.console("getUserInfo()");
@@ -227,17 +229,18 @@ export default {
             let response = this.call("GET", '/user/' + userId + '/');
 
             if (response) {
-                return this.users['' + userId] = response;
+                this.users.set('' + userId, response);
+                return this.users.get('' + userId);
             }
         },
         getUsernameById(userId){
             if (userId == null) userId = this.userAccount.id;
             this.console("getUsernameById("+userId+")");
 
-            if (!this.users[''+userId]){
+            if (!this.users.get(''+userId)){
                 this.getUserInfo(userId);
             }
-            return this.users[''+userId].username;
+            return this.users.get(''+userId).username;
         },
         convertUnixtimeToTime(timestamp){
             var date = new Date(timestamp*1000);
@@ -275,7 +278,10 @@ export default {
                 "name": name
             };
             var url = "/ref/"+this.curRepo.id+'/'+this.curRepo.commit.id+'/'+name;
-            return this.call("PUT", url, JSON.stringify(data));
+
+            let response = this.call("PUT", url, JSON.stringify(data));
+            console.log(response);
+            return response;
         },
         deleteBranch(){
             let name = this.page.createBranch.name;
@@ -285,7 +291,7 @@ export default {
                 return;
 
             var url = "/ref/"+this.curRepo.id+'/'+this.curRepo.commit.id+'/';
-            //return this.call("DELETE", url);
+            return this.call("DELETE", url);
         },
         getTagById(tagId){
             this.console("getTagById("+tagId+')');
@@ -295,5 +301,83 @@ export default {
                 return response;
             }
         },
-	}
+        getDataForLineChart(){
+            // labels
+            let months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+            let date = new Date(Date.now());
+            let labels = [];
+            let values = [0,0,0,0,0,0,0];
+
+            for (let i = 6; i >= 0; i--){
+                labels[i] = date.getDate() + ' ' + months[date.getMonth()];
+                date.setTime(date.getTime() - 24*60*60*1000);
+            }
+            date.setTime(date.getTime() - date.getHours()*60*60*1000 - date.getMinutes()*60*1000 - date.getSeconds()*1000 - date.getMilliseconds());
+            // values
+            let branchI = this.curRepo.branch.id;
+            for (let commitI in this.repos[''+this.curRepo.id].branches[branchI].commits){
+                let commitDate = new Date(this.repos[''+this.curRepo.id].branches[branchI].commits[commitI].timestamp*1000);
+                commitDate.setTime(commitDate.getTime() - commitDate.getHours()*60*60*1000 - commitDate.getMinutes()*60*1000 - commitDate.getSeconds()*1000 - commitDate.getMilliseconds());
+
+                if (commitDate.getTime() - date.getTime() < 0) continue;
+
+                let daysCount = (commitDate.getTime() - date.getTime()) / (24*60*60*1000) - 1;
+                values[daysCount]++;
+            }
+
+            return {
+                labels: labels,
+                values: values
+            }
+        },
+        getDataForDoughnut(){
+            let usersMap = new Map();
+
+            var branchI = this.curRepo.branch.id;
+            for (var commitI in this.repos[''+this.curRepo.id].branches[branchI].commits){
+                let userId = this.repos[''+this.curRepo.id].branches[branchI].commits[commitI].authorId;
+
+                if (!usersMap.get(userId)) {
+                    usersMap.set(userId, 1);
+                }
+                else{
+                    usersMap.set(userId, usersMap.get(userId) + 1);
+                }
+            }
+
+            let labels = [];
+            let values = [];
+
+            let i = 0;
+            let lab = [];
+
+            usersMap.delete(null);
+            usersMap.forEach(function(value, key, usersMap) {
+                lab[i++] = key;
+                values[i++] = value;
+            });
+
+            for (i = 0; i < lab.length; i++){;
+                labels[i+1] = this.users.get('' + lab[i]).username;
+            }
+
+            for (i = 0; i < labels.length-1; i++)
+                labels[i] = labels[i+1];
+            labels.pop();
+
+            for (i = 0; i < values.length-1; i++)
+                values[i] = values[i+1];
+            values.pop();
+
+            return {
+                labels: labels,
+                values: values
+            }
+        }
+	},
+    components: {
+        'commits-linechart': commitsHistory,
+        'contrib-doughnut': contribDoughnut
+    }
 };
